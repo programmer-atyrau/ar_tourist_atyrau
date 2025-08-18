@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/programmer-atyrau/ar_tourist_atyrau/static/css/main.f30a97c9.css",
+    "main.js": "/programmer-atyrau/ar_tourist_atyrau/static/js/main.377eafae.js",
+    "index.html": "/programmer-atyrau/ar_tourist_atyrau/index.html",
+    "main.f30a97c9.css.map": "/programmer-atyrau/ar_tourist_atyrau/static/css/main.f30a97c9.css.map",
+    "main.377eafae.js.map": "/programmer-atyrau/ar_tourist_atyrau/static/js/main.377eafae.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f30a97c9.css",
+    "static/js/main.377eafae.js"
+  ]
+}
