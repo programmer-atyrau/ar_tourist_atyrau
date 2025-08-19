@@ -11,6 +11,8 @@ function App() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [cameraError, setCameraError] = useState(null);
+  const [cameraPermission, setCameraPermission] = useState('unknown'); // 'unknown', 'granted', 'denied'
+  const [permissionMessage, setPermissionMessage] = useState('');
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -45,6 +47,28 @@ function App() {
     loadModel();
   }, []);
 
+  // Автоматическая проверка разрешений камеры при загрузке
+  useEffect(() => {
+    const checkInitialPermissions = async () => {
+      try {
+        if (navigator.permissions && navigator.permissions.query) {
+          const permission = await navigator.permissions.query({ name: 'camera' });
+          if (permission.state === 'granted') {
+            setCameraPermission('granted');
+            setPermissionMessage('Разрешение на камеру уже предоставлено');
+          } else if (permission.state === 'denied') {
+            setCameraPermission('denied');
+            setPermissionMessage('Доступ к камере запрещен');
+          }
+        }
+      } catch (err) {
+        console.log('Не удалось проверить начальные разрешения:', err);
+      }
+    };
+
+    checkInitialPermissions();
+  }, []);
+
   // Остановка камеры при размонтировании
   useEffect(() => {
     return () => {
@@ -62,6 +86,56 @@ function App() {
     return true;
   };
 
+  // Запрос разрешений на доступ к камере
+  const requestCameraPermission = async () => {
+    try {
+      // Проверяем текущие разрешения
+      if (navigator.permissions && navigator.permissions.query) {
+        const permission = await navigator.permissions.query({ name: 'camera' });
+        
+        if (permission.state === 'granted') {
+          setCameraPermission('granted');
+          setPermissionMessage('Разрешение на камеру уже предоставлено');
+          return { granted: true, message: 'Разрешение на камеру уже предоставлено' };
+        } else if (permission.state === 'denied') {
+          setCameraPermission('denied');
+          setPermissionMessage('Доступ к камере запрещен. Разрешите в настройках браузера.');
+          return { granted: false, message: 'Доступ к камере запрещен. Разрешите в настройках браузера.' };
+        }
+      }
+
+      // Запрашиваем разрешение через getUserMedia
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      
+      // Сразу останавливаем поток, так как мы только проверяем разрешения
+      stream.getTracks().forEach(track => track.stop());
+      
+      setCameraPermission('granted');
+      setPermissionMessage('Разрешение на камеру предоставлено');
+      return { granted: true, message: 'Разрешение на камеру предоставлено' };
+    } catch (err) {
+      console.error('Ошибка запроса разрешений:', err);
+      
+      let message = '';
+      if (err.name === 'NotAllowedError') {
+        message = 'Доступ к камере запрещен пользователем';
+        setCameraPermission('denied');
+      } else if (err.name === 'NotFoundError') {
+        message = 'Камера не найдена на устройстве';
+        setCameraPermission('denied');
+      } else if (err.name === 'NotSupportedError') {
+        message = 'Браузер не поддерживает доступ к камере';
+        setCameraPermission('denied');
+      } else {
+        message = `Ошибка доступа к камере: ${err.message}`;
+        setCameraPermission('denied');
+      }
+      
+      setPermissionMessage(message);
+      return { granted: false, message };
+    }
+  };
+
   // Запуск камеры с улучшенной обработкой ошибок
   const startCamera = async () => {
     try {
@@ -73,6 +147,16 @@ function App() {
       if (!checkCameraSupport()) {
         throw new Error('Ваш браузер не поддерживает доступ к камере');
       }
+
+      // Сначала запрашиваем разрешения на камеру
+      console.log('Запрашиваем разрешения на камеру...');
+      const permissionResult = await requestCameraPermission();
+      
+      if (!permissionResult.granted) {
+        throw new Error(permissionResult.message);
+      }
+
+      console.log('Разрешения получены, запускаем камеру...');
 
       // Пробуем разные настройки камеры для Android
       const constraints = {
@@ -320,6 +404,29 @@ function App() {
             {isCameraActive ? 'Остановить камеру' : 'Запустить камеру'}
           </button>
 
+          <button
+            onClick={async () => {
+              try {
+                const result = await requestCameraPermission();
+                if (result.granted) {
+                  // Показываем уведомление вместо alert
+                  setCameraPermission('granted');
+                  setPermissionMessage(result.message);
+                } else {
+                  setCameraPermission('denied');
+                  setPermissionMessage(result.message);
+                }
+              } catch (err) {
+                setCameraPermission('denied');
+                setPermissionMessage('Ошибка при проверке разрешений: ' + err.message);
+              }
+            }}
+            className="px-6 py-4 rounded-xl text-lg font-semibold bg-yellow-500 hover:bg-yellow-600 text-white transition-all transform hover:scale-105"
+            title="Проверить разрешения на камеру"
+          >
+            🔐 Проверить разрешения
+          </button>
+
           <label className="px-8 py-4 rounded-xl text-lg font-semibold bg-green-500 hover:bg-green-600 text-white cursor-pointer transition-all transform hover:scale-105">
             Выбрать из галереи
             <input
@@ -331,6 +438,42 @@ function App() {
             />
           </label>
         </div>
+
+        {/* Статус разрешений камеры */}
+        {cameraPermission !== 'unknown' && (
+          <div className={`border rounded-xl p-4 mb-6 ${
+            cameraPermission === 'granted' 
+              ? 'bg-green-50 border-green-200' 
+              : 'bg-red-50 border-red-200'
+          }`}>
+            <div className="flex items-center">
+              <div className={`text-2xl mr-3 ${
+                cameraPermission === 'granted' ? 'text-green-500' : 'text-red-500'
+              }`}>
+                {cameraPermission === 'granted' ? '✅' : '❌'}
+              </div>
+              <div>
+                <h4 className={`font-semibold ${
+                  cameraPermission === 'granted' ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {cameraPermission === 'granted' ? 'Разрешения получены' : 'Проблема с разрешениями'}
+                </h4>
+                <p className={`text-sm ${
+                  cameraPermission === 'granted' ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {permissionMessage}
+                </p>
+                {cameraPermission === 'denied' && (
+                  <div className="mt-2 space-y-1 text-xs text-red-600">
+                    <p>• Нажмите кнопку "🔐 Проверить разрешения" для повторной попытки</p>
+                    <p>• Убедитесь, что используете HTTPS соединение</p>
+                    <p>• Разрешите доступ к камере в настройках браузера</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Ошибка камеры */}
         {cameraError && (
