@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-converter';
+import { TargetIcon, SearchIcon, PhotoIcon, LockIcon, FolderIcon, LightBulbIcon, ExclamationIcon, CheckIcon, XIcon, PlayIcon, StopIcon, CogIcon, InformationCircleIcon } from './components/Icons';
 
 function App() {
   const [model, setModel] = useState(null);
@@ -364,7 +365,9 @@ function App() {
     return (
       <div className="native-page flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <div className="text-red-400 text-6xl mb-4">⚠️</div>
+          <div className="text-red-400 text-6xl mb-4">
+            <ExclamationIcon className="w-24 h-24 mx-auto" />
+          </div>
           <h2 className="native-feature-title text-red-400">Произошла ошибка</h2>
           <p className="native-feature-text text-red-400 mb-4">{error}</p>
           <button
@@ -401,7 +404,14 @@ function App() {
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {isCameraActive ? 'Остановить камеру' : 'Запустить камеру'}
+            <div className="flex items-center">
+              {isCameraActive ? (
+                <StopIcon className="w-5 h-5 mr-2" />
+              ) : (
+                <PlayIcon className="w-5 h-5 mr-2" />
+              )}
+              {isCameraActive ? 'Остановить камеру' : 'Запустить камеру'}
+            </div>
           </button>
 
           <button
@@ -424,11 +434,17 @@ function App() {
             className="native-button bg-yellow-600 hover:bg-yellow-700"
             title="Проверить разрешения на камеру"
           >
-            🔐 Проверить разрешения
+            <div className="flex items-center">
+              <LockIcon className="w-5 h-5 mr-2" />
+              Проверить разрешения
+            </div>
           </button>
 
           <label className="native-button bg-green-600 hover:bg-green-700 cursor-pointer">
-            Выбрать из галереи
+            <div className="flex items-center">
+              <FolderIcon className="w-5 h-5 mr-2" />
+              Выбрать из галереи
+            </div>
             <input
               ref={fileInputRef}
               type="file"
@@ -450,7 +466,7 @@ function App() {
               <div className={`text-2xl mr-3 ${
                 cameraPermission === 'granted' ? 'text-green-400' : 'text-red-400'
               }`}>
-                {cameraPermission === 'granted' ? '✅' : '❌'}
+                {cameraPermission === 'granted' ? <CheckIcon className="w-8 h-8" /> : <XIcon className="w-8 h-8" />}
               </div>
               <div>
                 <h4 className={`native-feature-title ${
@@ -465,7 +481,7 @@ function App() {
                 </p>
                 {cameraPermission === 'denied' && (
                   <div className="mt-2 space-y-1 text-xs text-red-400">
-                    <p>• Нажмите кнопку "🔐 Проверить разрешения" для повторной попытки</p>
+                    <p>• Нажмите кнопку "Проверить разрешения" для повторной попытки</p>
                     <p>• Убедитесь, что используете HTTPS соединение</p>
                     <p>• Разрешите доступ к камере в настройках браузера</p>
                   </div>
@@ -479,7 +495,9 @@ function App() {
         {cameraError && (
           <div className="native-section bg-red-900/20 border-red-500/30 mb-6">
             <div className="flex items-center">
-              <div className="text-red-400 text-2xl mr-3">📷</div>
+              <div className="text-red-400 text-2xl mr-3">
+                <PhotoIcon className="w-8 h-8" />
+              </div>
               <div>
                 <h4 className="native-feature-title text-red-400">Проблема с камерой</h4>
                 <p className="native-feature-text text-red-400">{cameraError}</p>
@@ -516,7 +534,10 @@ function App() {
                     onClick={takePhoto}
                     className="native-button bg-white/90 hover:bg-white text-gray-800 px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-110"
                   >
-                    📸 Сделать снимок
+                    <div className="flex items-center">
+                      <PhotoIcon className="w-5 h-5 mr-2" />
+                      Сделать снимок
+                    </div>
                   </button>
                 </div>
               </div>
@@ -532,13 +553,15 @@ function App() {
                   className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors"
                   title="Убрать изображение"
                 >
-                  ✕
+                  <XIcon className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <div className="bg-gray-800 w-full h-80 rounded-xl flex items-center justify-center">
                 <div className="text-center text-gray-400">
-                  <div className="text-6xl mb-4">📷</div>
+                  <div className="text-6xl mb-4">
+                    <PhotoIcon className="w-24 h-24 mx-auto" />
+                  </div>
                   <p>Камера неактивна</p>
                   <p className="text-sm mt-1">Выберите изображение из галереи</p>
                 </div>
@@ -555,7 +578,9 @@ function App() {
             {prediction ? (
               <div className="native-card result-fade-in">
                 <div className="text-center mb-4">
-                  <div className="text-4xl mb-2">🎯</div>
+                  <div className="text-4xl mb-2">
+                    <TargetIcon className="w-16 h-16 text-green-400 mx-auto" />
+                  </div>
                   <h3 className="native-feature-title mb-2">
                     Распознано: {prediction}
                   </h3>
@@ -579,7 +604,9 @@ function App() {
               </div>
             ) : (
               <div className="native-card text-center">
-                <div className="text-6xl mb-4">🔍</div>
+                <div className="text-6xl mb-4">
+                  <SearchIcon className="w-24 h-24 text-blue-400 mx-auto" />
+                </div>
                 <h3 className="native-feature-title mb-2">
                   Ожидание изображения
                 </h3>
@@ -594,7 +621,10 @@ function App() {
 
             {/* Инструкции */}
             <div className="native-instructions">
-              <h4 className="native-instructions-title">💡 Советы:</h4>
+              <h4 className="native-instructions-title flex items-center">
+                <LightBulbIcon className="w-5 h-5 mr-2" />
+                Советы:
+              </h4>
               <ul className="space-y-1">
                 <li className="native-instructions-text">• Убедитесь, что объект хорошо освещен</li>
                 <li className="native-instructions-text">• Попробуйте разные ракурсы</li>
