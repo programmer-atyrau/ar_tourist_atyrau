@@ -84,29 +84,89 @@ function App() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       return false;
     }
+    
+    // Дополнительная проверка для мобильных устройств
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      console.log('Обнаружено мобильное устройство');
+    }
+    
     return true;
   };
 
   // Запрос разрешений на доступ к камере
   const requestCameraPermission = async () => {
     try {
+      // Определяем тип устройства
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      
+      console.log('Запрашиваем разрешения для:', isAndroid ? 'Android' : isIOS ? 'iOS' : 'Desktop');
+      
       // Проверяем текущие разрешения
       if (navigator.permissions && navigator.permissions.query) {
-        const permission = await navigator.permissions.query({ name: 'camera' });
-        
-        if (permission.state === 'granted') {
-          setCameraPermission('granted');
-          setPermissionMessage('Разрешение на камеру уже предоставлено');
-          return { granted: true, message: 'Разрешение на камеру уже предоставлено' };
-        } else if (permission.state === 'denied') {
-          setCameraPermission('denied');
-          setPermissionMessage('Доступ к камере запрещен. Разрешите в настройках браузера.');
-          return { granted: false, message: 'Доступ к камере запрещен. Разрешите в настройках браузера.' };
+        try {
+          const permission = await navigator.permissions.query({ name: 'camera' });
+          
+          if (permission.state === 'granted') {
+            setCameraPermission('granted');
+            setPermissionMessage('Разрешение на камеру уже предоставлено');
+            return { granted: true, message: 'Разрешение на камеру уже предоставлено' };
+          } else if (permission.state === 'denied') {
+            setCameraPermission('denied');
+            setPermissionMessage('Доступ к камере запрещен. Разрешите в настройках браузера.');
+            return { granted: false, message: 'Доступ к камере запрещен. Разрешите в настройках браузера.' };
+          }
+        } catch (permErr) {
+          console.log('Не удалось проверить разрешения через API:', permErr);
+          // Продолжаем с getUserMedia
         }
       }
 
-      // Запрашиваем разрешение через getUserMedia
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Для мобильных устройств пробуем сразу получить доступ
+      console.log('Запрашиваем доступ к камере через getUserMedia...');
+      
+      let stream;
+      
+      if (isAndroid) {
+        // Специальные настройки для Android при проверке разрешений
+        const androidTestConstraints = [
+          { video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } },
+          { video: { facingMode: 'environment' } },
+          { video: true }
+        ];
+        
+        for (let i = 0; i < androidTestConstraints.length; i++) {
+          try {
+            console.log(`Пробуем Android тест разрешений ${i + 1}...`);
+            stream = await navigator.mediaDevices.getUserMedia(androidTestConstraints[i]);
+            console.log(`Android разрешения получены с настройками ${i + 1}`);
+            break;
+          } catch (err) {
+            console.log(`Android тест ${i + 1} не сработал:`, err.name);
+            if (i === androidTestConstraints.length - 1) {
+              throw err;
+            }
+          }
+        }
+      } else if (isIOS) {
+        // Специальные настройки для iOS при проверке разрешений
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: 'environment',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          } 
+        });
+      } else {
+        // Для десктопа
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          } 
+        });
+      }
       
       // Сразу останавливаем поток, так как мы только проверяем разрешения
       stream.getTracks().forEach(track => track.stop());
@@ -119,13 +179,19 @@ function App() {
       
       let message = '';
       if (err.name === 'NotAllowedError') {
-        message = 'Доступ к камере запрещен пользователем';
+        message = 'Доступ к камере запрещен пользователем. Разрешите доступ в настройках браузера.';
         setCameraPermission('denied');
       } else if (err.name === 'NotFoundError') {
-        message = 'Камера не найдена на устройстве';
+        message = 'Камера не найдена на устройстве. Убедитесь, что устройство имеет камеру.';
         setCameraPermission('denied');
       } else if (err.name === 'NotSupportedError') {
-        message = 'Браузер не поддерживает доступ к камере';
+        message = 'Браузер не поддерживает доступ к камере. Попробуйте Chrome или Safari.';
+        setCameraPermission('denied');
+      } else if (err.name === 'NotReadableError') {
+        message = 'Камера используется другим приложением. Закройте другие приложения, использующие камеру.';
+        setCameraPermission('denied');
+      } else if (err.name === 'OverconstrainedError') {
+        message = 'Запрошенные настройки камеры не поддерживаются устройством.';
         setCameraPermission('denied');
       } else {
         message = `Ошибка доступа к камере: ${err.message}`;
@@ -159,42 +225,204 @@ function App() {
 
       console.log('Разрешения получены, запускаем камеру...');
 
-      // Пробуем разные настройки камеры для Android
-      const constraints = {
-        video: {
-          facingMode: 'environment', // Основная камера
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      };
+      // Определяем тип устройства
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      
+      console.log('Тип устройства:', isAndroid ? 'Android' : isIOS ? 'iOS' : 'Desktop');
 
       let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-      } catch (err) {
-        // Fallback для Android - пробуем без конкретных настроек
-        console.log('Пробуем fallback настройки камеры...');
-        stream = await navigator.mediaDevices.getUserMedia({ 
-          video: true 
-        });
+      
+      if (isAndroid) {
+        // Специальные настройки для Android
+        console.log('Применяем настройки для Android...');
+        
+        const androidConstraints = [
+          // Попытка 1: Основная камера с высоким разрешением
+          {
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 1280, max: 1920 },
+              height: { ideal: 720, max: 1080 }
+            }
+          },
+          // Попытка 2: Основная камера со средним разрешением
+          {
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 640, max: 1280 },
+              height: { ideal: 480, max: 720 }
+            }
+          },
+          // Попытка 3: Основная камера с низким разрешением
+          {
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 320, max: 640 },
+              height: { ideal: 240, max: 480 }
+            }
+          },
+          // Попытка 4: Любая камера
+          {
+            video: {
+              facingMode: { ideal: 'environment' },
+              width: { ideal: 640 },
+              height: { ideal: 480 }
+            }
+          },
+          // Попытка 5: Базовые настройки
+          {
+            video: {
+              facingMode: 'environment'
+            }
+          },
+          // Попытка 6: Минимальные требования
+          {
+            video: true
+          }
+        ];
+
+        for (let i = 0; i < androidConstraints.length; i++) {
+          try {
+            console.log(`Пробуем Android настройки ${i + 1}...`);
+            stream = await navigator.mediaDevices.getUserMedia(androidConstraints[i]);
+            console.log(`Android камера запущена с настройками ${i + 1}`);
+            break;
+          } catch (err) {
+            console.log(`Android настройки ${i + 1} не сработали:`, err.name);
+            if (i === androidConstraints.length - 1) {
+              throw err;
+            }
+          }
+        }
+      } else if (isIOS) {
+        // Специальные настройки для iOS
+        console.log('Применяем настройки для iOS...');
+        
+        const iosConstraints = [
+          {
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
+          },
+          {
+            video: {
+              facingMode: 'environment'
+            }
+          },
+          {
+            video: true
+          }
+        ];
+
+        for (let i = 0; i < iosConstraints.length; i++) {
+          try {
+            console.log(`Пробуем iOS настройки ${i + 1}...`);
+            stream = await navigator.mediaDevices.getUserMedia(iosConstraints[i]);
+            console.log(`iOS камера запущена с настройками ${i + 1}`);
+            break;
+          } catch (err) {
+            console.log(`iOS настройки ${i + 1} не сработали:`, err.name);
+            if (i === iosConstraints.length - 1) {
+              throw err;
+            }
+          }
+        }
+      } else {
+        // Настройки для десктопа
+        console.log('Применяем настройки для десктопа...');
+        
+        const desktopConstraints = [
+          {
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
+          },
+          {
+            video: true
+          }
+        ];
+
+        for (let i = 0; i < desktopConstraints.length; i++) {
+          try {
+            console.log(`Пробуем десктоп настройки ${i + 1}...`);
+            stream = await navigator.mediaDevices.getUserMedia(desktopConstraints[i]);
+            console.log(`Десктоп камера запущена с настройками ${i + 1}`);
+            break;
+          } catch (err) {
+            console.log(`Десктоп настройки ${i + 1} не сработали:`, err.name);
+            if (i === desktopConstraints.length - 1) {
+              throw err;
+            }
+          }
+        }
       }
+      
+      if (!stream) {
+        throw new Error('Не удалось получить поток камеры');
+      }
+      
+      // Проверяем состояние потока
+      const videoTrack = stream.getVideoTracks()[0];
+      if (!videoTrack) {
+        throw new Error('Видео поток не найден');
+      }
+      
+      console.log('Состояние видео трека:', videoTrack.readyState);
+      console.log('Настройки трека:', videoTrack.getSettings());
       
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
+      
+      // Принудительно обновляем видео элемент
+      videoRef.current.load();
+      
+      // Ждем загрузки видео с увеличенным таймаутом для мобильных
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Таймаут загрузки видео'));
+        }, isAndroid || isIOS ? 15000 : 10000); // Больше времени для мобильных
+        
+        videoRef.current.onloadedmetadata = () => {
+          clearTimeout(timeout);
+          console.log('Видео загружено, размер:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+          
+          // Принудительно запускаем воспроизведение
+          videoRef.current.play().then(() => {
+            console.log('Видео воспроизводится');
+            resolve();
+          }).catch(playErr => {
+            console.log('Ошибка воспроизведения:', playErr);
+            // Даже если воспроизведение не удалось, продолжаем
+            resolve();
+          });
+        };
+        
+        videoRef.current.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error('Ошибка загрузки видео'));
+        };
+        
+        // Дополнительная проверка готовности
+        videoRef.current.oncanplay = () => {
+          console.log('Видео готово к воспроизведению');
+        };
+      });
+      
       setIsCameraActive(true);
       
-      // Ждем загрузки видео перед распознаванием
-      videoRef.current.onloadedmetadata = () => {
-        // Автоматическое распознавание каждые 2 секунды
-        const recognitionInterval = setInterval(() => {
-          if (isCameraActive && model && videoRef.current.readyState >= 2) {
-            recognizeImage();
-          }
-        }, 2000);
+      // Автоматическое распознавание каждые 2 секунды
+      const recognitionInterval = setInterval(() => {
+        if (isCameraActive && model && videoRef.current.readyState >= 2) {
+          recognizeImage();
+        }
+      }, 2000);
 
-        // Очистка интервала при остановке камеры
-        return () => clearInterval(recognitionInterval);
-      };
+      // Очистка интервала при остановке камеры
+      return () => clearInterval(recognitionInterval);
 
     } catch (err) {
       console.error('Ошибка доступа к камере:', err);
@@ -212,6 +440,10 @@ function App() {
         errorMessage = 'Запрошенные настройки камеры не поддерживаются.';
       } else if (err.name === 'TypeError') {
         errorMessage = 'Ошибка типа. Возможно, проблема с HTTPS соединением.';
+      } else if (err.message.includes('Таймаут')) {
+        errorMessage = 'Камера не отвечает. Попробуйте перезагрузить страницу.';
+      } else if (err.message.includes('поток камеры')) {
+        errorMessage = 'Не удалось инициализировать камеру. Попробуйте другой браузер.';
       }
       
       setCameraError(errorMessage);
@@ -221,12 +453,22 @@ function App() {
   // Остановка камеры
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('Трек остановлен:', track.kind);
+      });
       streamRef.current = null;
     }
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+      videoRef.current.load();
+    }
+    
     setIsCameraActive(false);
     setPrediction(null);
     setCameraError(null);
+    console.log('Камера остановлена');
   };
 
   // Очистить выбранное изображение
@@ -299,38 +541,49 @@ function App() {
   const recognizeImage = () => {
     if (!videoRef.current || !model || videoRef.current.readyState < 2) return;
     
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = 224;
-    canvas.height = 224;
-    
-    // Рисуем текущий кадр с видео
-    ctx.drawImage(videoRef.current, 0, 0, 224, 224);
-    
-    const imageData = ctx.getImageData(0, 0, 224, 224);
-    const tensor = tf.browser.fromPixels(imageData, 3)
-      .expandDims()
-      .div(255.0);
-    
-    model.predict(tensor).array().then(predictions => {
-      const predictionArray = predictions[0];
-      const maxIndex = predictionArray.indexOf(Math.max(...predictionArray));
-      const confidence = predictionArray[maxIndex];
+    try {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
       
-      const classes = ["Person 1", "Person 2", "Person 3"];
-      const predictedClass = classes[maxIndex];
+      // Устанавливаем размер canvas
+      canvas.width = 224; // Размер для Teachable Machine
+      canvas.height = 224;
       
-      // Показываем результат только если уверенность > 70%
-      if (confidence > 0.7) {
+      // Рисуем текущий кадр с камеры на canvas
+      ctx.drawImage(videoRef.current, 0, 0, 224, 224);
+      
+      // Получаем данные изображения
+      const imageData = ctx.getImageData(0, 0, 224, 224);
+      
+      // Конвертируем в тензор
+      const tensor = tf.browser.fromPixels(imageData, 3)
+        .expandDims()
+        .div(255.0);
+      
+      // Предсказание
+      model.predict(tensor).array().then(predictions => {
+        const predictionArray = predictions[0];
+        const maxIndex = predictionArray.indexOf(Math.max(...predictionArray));
+        const confidence = predictionArray[maxIndex];
+        
+        // Получаем название класса (замените на ваши метки)
+        const classes = ["Person 1", "Person 2", "Person 3"];
+        const predictedClass = classes[maxIndex];
+        
         setPrediction(predictedClass);
         setConfidence(confidence);
-      } else {
-        setPrediction(null);
-      }
+        
+        // Очищаем память
+        tensor.dispose();
+      }).catch(err => {
+        console.error('Ошибка предсказания:', err);
+        // Не показываем ошибку пользователю, просто логируем
+      });
       
-      tensor.dispose();
-    });
+    } catch (err) {
+      console.error('Ошибка распознавания кадра:', err);
+      // Не показываем ошибку пользователю, просто логируем
+    }
   };
 
   // Сделать снимок
@@ -413,6 +666,19 @@ function App() {
               {isCameraActive ? 'Остановить камеру' : 'Запустить камеру'}
             </div>
           </button>
+
+          {isCameraActive && (
+            <button
+              onClick={startCamera}
+              className="native-button bg-orange-600 hover:bg-orange-700"
+              title="Перезапустить камеру"
+            >
+              <div className="flex items-center">
+                <CogIcon className="w-5 h-5 mr-2" />
+              Перезапустить камеру
+              </div>
+            </button>
+          )}
 
           <button
             onClick={async () => {
@@ -506,6 +772,30 @@ function App() {
                   <p>• Разрешите доступ к камере в настройках браузера</p>
                   <p>• Попробуйте Chrome или Safari на мобильных устройствах</p>
                   <p>• Закройте другие приложения, использующие камеру</p>
+                  <p>• Попробуйте кнопку "Перезапустить камеру"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Информация о камере для отладки */}
+        {isCameraActive && (
+          <div className="native-section bg-blue-900/20 border-blue-500/30 mb-6">
+            <div className="flex items-center">
+              <div className="text-blue-400 text-2xl mr-3">
+                <InformationCircleIcon className="w-8 h-8" />
+              </div>
+              <div>
+                <h4 className="native-feature-title text-blue-400">Состояние камеры</h4>
+                <p className="native-feature-text text-blue-400">
+                  Камера активна. Если видео не отображается, попробуйте:
+                </p>
+                <div className="mt-2 space-y-1 text-xs text-blue-400">
+                  <p>• Обновить страницу</p>
+                  <p>• Нажать "Перезапустить камеру"</p>
+                  <p>• Проверить консоль браузера на ошибки</p>
+                  <p>• Убедиться, что камера не используется другими приложениями</p>
                 </div>
               </div>
             </div>
@@ -521,13 +811,27 @@ function App() {
             </h2>
             
             {isCameraActive ? (
-              <div className="camera-container">
+              <div className="camera-container camera-active">
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
-                  className="w-full h-80 object-cover rounded-xl"
+                  controls={false}
+                  style={{ transform: 'scaleX(-1)' }} // Зеркальное отражение для фронтальной камеры
+                  className="w-full h-80 object-cover rounded-xl bg-black"
+                  onLoadedMetadata={() => {
+                    console.log('Видео метаданные загружены');
+                    if (videoRef.current) {
+                      console.log('Размер видео:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+                    }
+                  }}
+                  onCanPlay={() => {
+                    console.log('Видео готово к воспроизведению');
+                  }}
+                  onError={(e) => {
+                    console.error('Ошибка видео:', e);
+                  }}
                 />
                 <div className="camera-overlay">
                   <button

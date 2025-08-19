@@ -141,11 +141,11 @@ function ObjectInfo({ object }) {
         </div>
         {object.modelPath && (
           <div className="bg-green-900/20 border border-green-500/30 p-3 rounded-lg">
-            {/* <p className="text-green-400 text-sm flex items-center">
+            {/* <p className="text-green-400 text-sm flex items-center justify-center">
               <CheckIcon className="w-4 h-4 mr-2" />
               3D модель загружена: {object.modelPath}
             </p> */}
-            <p className="text-green-500 text-xs mt-1">
+            <p className="text-green-500 text-xs mt-1 text-center">
               Модель автоматически вращается и масштабируется
             </p>
           </div>
@@ -227,13 +227,15 @@ function ThreeDObjects() {
                   selectedObject?.id === object.id ? 'selected' : ''
                 }`}
               >
-                <div className="native-icon">
+                <div className="flex justify-center">
+                  <div className="native-icon flex justify-center">
                   <IconComponent className="w-12 h-12 text-blue-400" />
                 </div>
-                <h3 className="native-feature-title">{object.name}</h3>
-                <p className="native-feature-text">{object.architecturalStyle}</p>
+                </div>
+                <h3 className="native-feature-title text-center">{object.name}</h3>
+                <p className="native-feature-text text-center">{object.architecturalStyle}</p>
                 {object.modelPath && (
-                  <div className="mt-2 text-xs text-green-400 flex items-center">
+                  <div className="mt-2 text-xs text-green-400 flex items-center justify-center">
                     <CheckIcon className="w-3 h-3 mr-1" />
                     3D модель доступна
                   </div>
@@ -249,7 +251,7 @@ function ThreeDObjects() {
             {/* 3D сцена */}
             <div className="space-y-4">
               <h2 className="native-feature-title text-center">
-                {selectedObject.name}
+                 {selectedObject.name}
               </h2>
               <div className="native-3d-scene">
                 <Scene selectedObject={selectedObject} />
@@ -291,30 +293,30 @@ function ThreeDObjects() {
 
         {/* Инструкции по добавлению 3D моделей */}
         {/* <div className="native-instructions">
-          <h3 className="native-instructions-title flex items-center">
+          <h3 className="native-instructions-title flex items-center justify-center">
             <DocumentTextIcon className="w-6 h-6 mr-2" />
             Как добавить свои 3D модели (.obj файлы)
           </h3>
           <div className="space-y-3">
-            <p className="native-instructions-text flex items-center">
+            <p className="native-instructions-text flex items-center justify-center">
               <span className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
               Поместите ваш .obj файл в папку <code className="native-code-block">public/models/</code>
             </p>
-            <p className="native-instructions-text flex items-center">
+            <p className="native-instructions-text flex items-center justify-center">
               <span className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
               Добавьте информацию об объекте в массив <code className="native-code-block">objects</code>
             </p>
-            <p className="native-instructions-text flex items-center">
+            <p className="native-instructions-text flex items-center justify-center">
               <span className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold">3</span>
               Укажите путь к модели в поле <code className="native-code-block">modelPath</code>
             </p>
-            <p className="native-instructions-text flex items-center">
+            <p className="native-instructions-text flex items-center justify-center">
               <span className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold">4</span>
               Модель автоматически загрузится и отобразится!
             </p>
           </div>
           <div className="mt-4 p-4 bg-yellow-900/20 rounded-lg">
-            <p className="text-sm text-yellow-400 flex items-center">
+            <p className="text-sm text-yellow-400 flex items-center justify-center">
               <InformationCircleIcon className="w-4 h-4 mr-2" />
               <strong>Пример:</strong>
             </p>
@@ -333,11 +335,11 @@ function ThreeDObjects() {
           </div>
           
           <div className="mt-4 p-4 bg-blue-900/20 rounded-lg">
-            <h4 className="font-semibold text-blue-400 mb-2 flex items-center">
+            <h4 className="font-semibold text-blue-400 mb-2 flex items-center justify-center">
               <CogIcon className="w-4 h-4 mr-2" />
               Технические требования:
             </h4>
-            <ul className="text-sm text-blue-400 space-y-1">
+            <ul className="text-sm text-blue-400 space-y-1 text-center">
               <li>• Формат файла: .obj (Wavefront OBJ)</li>
               <li>• Размер: рекомендуется до 10MB</li>
               <li>• Текстуры: поддерживаются .mtl файлы</li>
