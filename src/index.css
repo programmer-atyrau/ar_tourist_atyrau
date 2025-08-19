@@ -2,25 +2,284 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Нативный мобильный дизайн */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  padding: 0;
+  font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Предотвращение масштабирования */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Фиксированный размер */
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000000;
+  color: #ffffff;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Разрешить скролл только в main контейнере */
+#root {
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #000000;
 }
 
-/* Кастомные стили для камеры */
+/* Нативные компоненты */
+.native-app {
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.native-nav {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.native-content {
+  background: #000000;
+  color: #ffffff;
+  padding: 0;
+}
+
+.native-home {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  min-height: 100vh;
+  padding: 20px 16px;
+}
+
+.native-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height: 1.1;
+  background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+}
+
+.native-description {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  line-height: 1.5;
+  color: #a8a8a8;
+  margin-bottom: 3rem;
+}
+
+.native-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.native-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.native-button {
+  background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%);
+  color: #ffffff;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 16px 32px;
+  border-radius: 16px;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+}
+
+.native-button:hover {
+  background: linear-gradient(135deg, #0056CC 0%, #004499 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 25px rgba(0, 122, 255, 0.4);
+}
+
+.native-features {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+}
+
+/* Мобильная навигация */
+.mobile-nav-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Нативные карточки */
+.native-feature-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.native-feature-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Нативные заголовки */
+.native-feature-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.native-feature-text {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #a8a8a8;
+  line-height: 1.4;
+}
+
+/* Нативные иконки */
+.native-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .native-home {
+    padding: 16px 12px;
+  }
+  
+  .native-card {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .native-button {
+    width: 100%;
+    padding: 18px 24px;
+    font-size: 1.125rem;
+  }
+  
+  .native-title {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+  }
+  
+  .native-description {
+    font-size: clamp(0.875rem, 3.5vw, 1.125rem);
+  }
+}
+
+/* Дополнительные нативные стили */
+.native-gradient-bg {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+.native-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.native-shadow {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Анимации для нативного ощущения */
+@keyframes nativeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.native-fade-in {
+  animation: nativeFadeIn 0.6s ease-out;
+}
+
+/* Нативные скроллбары */
+.native-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.native-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.native-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.native-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Стили для камеры в нативном дизайне */
 .camera-container {
   position: relative;
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .camera-overlay {
@@ -29,24 +288,216 @@ code {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* Анимация для результатов */
+/* Анимация для результатов в нативном дизайне */
 .result-fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: nativeFadeIn 0.6s ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+/* Стили для кода */
+code {
+  font-family: 'Inter Tight', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+/* Дополнительные нативные стили для всех страниц */
+.native-page {
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 20px 16px;
+}
+
+.native-section {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.native-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  color: #ffffff;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.native-input:focus {
+  outline: none;
+  border-color: #007AFF;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.native-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Стили для 3D объектов в нативном дизайне */
+.native-3d-container {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.native-3d-scene {
+  background: #1a1a1a;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Стили для навигации между объектами */
+.native-object-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.native-object-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.native-object-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.native-object-card.selected {
+  background: rgba(0, 122, 255, 0.1);
+  border-color: #007AFF;
+  box-shadow: 0 0 20px rgba(0, 122, 255, 0.2);
+}
+
+/* Стили для информации об объекте */
+.native-object-info {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.native-object-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.native-info-section {
+  margin-bottom: 20px;
+}
+
+.native-info-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  color: #007AFF;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.native-info-text {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 400;
+  color: #a8a8a8;
+  line-height: 1.6;
+  font-size: 0.875rem;
+}
+
+/* Стили для инструкций */
+.native-instructions {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.native-instructions-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  color: #FFC107;
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+}
+
+.native-instructions-text {
+  font-family: 'Inter Tight', sans-serif;
+  color: #FFC107;
+  margin-bottom: 12px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.native-code-block {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  font-family: 'Inter Tight', monospace;
+  font-size: 0.75rem;
+  color: #a8a8a8;
+  overflow-x: auto;
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 480px) {
+  .native-home {
+    padding: 12px 8px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .native-card {
+    padding: 16px;
+  }
+  
+  .native-button {
+    padding: 16px 20px;
+    font-size: 1rem;
+  }
+  
+  .native-title {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+  
+  .native-description {
+    font-size: clamp(0.75rem, 3vw, 1rem);
+  }
+  
+  .native-object-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -350,11 +350,11 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="native-page flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">Загрузка модели...</h2>
-          <p className="text-gray-500 mt-2">Пожалуйста, подождите</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <h2 className="native-feature-title">Загрузка модели...</h2>
+          <p className="native-feature-text">Пожалуйста, подождите</p>
         </div>
       </div>
     );
@@ -362,14 +362,14 @@ function App() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center p-4">
+      <div className="native-page flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-red-700 mb-2">Произошла ошибка</h2>
-          <p className="text-red-600 mb-4">{error}</p>
+          <div className="text-red-400 text-6xl mb-4">⚠️</div>
+          <h2 className="native-feature-title text-red-400">Произошла ошибка</h2>
+          <p className="native-feature-text text-red-400 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="native-button bg-red-600 hover:bg-red-700"
           >
             Попробовать снова
           </button>
@@ -379,15 +379,15 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="native-page">
+      <div className="max-w-6xl mx-auto">
         {/* Заголовок */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            AR Tourist
-          </h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="native-title">
             Распознавание изображений с помощью ИИ
+          </h1>
+          <p className="native-description">
+            Используйте камеру или загружайте фотографии для автоматического распознавания объектов
           </p>
         </div>
 
@@ -395,10 +395,10 @@ function App() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button
             onClick={isCameraActive ? stopCamera : startCamera}
-            className={`px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 ${
+            className={`native-button ${
               isCameraActive
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
             {isCameraActive ? 'Остановить камеру' : 'Запустить камеру'}
@@ -421,13 +421,13 @@ function App() {
                 setPermissionMessage('Ошибка при проверке разрешений: ' + err.message);
               }
             }}
-            className="px-6 py-4 rounded-xl text-lg font-semibold bg-yellow-500 hover:bg-yellow-600 text-white transition-all transform hover:scale-105"
+            className="native-button bg-yellow-600 hover:bg-yellow-700"
             title="Проверить разрешения на камеру"
           >
             🔐 Проверить разрешения
           </button>
 
-          <label className="px-8 py-4 rounded-xl text-lg font-semibold bg-green-500 hover:bg-green-600 text-white cursor-pointer transition-all transform hover:scale-105">
+          <label className="native-button bg-green-600 hover:bg-green-700 cursor-pointer">
             Выбрать из галереи
             <input
               ref={fileInputRef}
@@ -441,30 +441,30 @@ function App() {
 
         {/* Статус разрешений камеры */}
         {cameraPermission !== 'unknown' && (
-          <div className={`border rounded-xl p-4 mb-6 ${
+          <div className={`native-section mb-6 ${
             cameraPermission === 'granted' 
-              ? 'bg-green-50 border-green-200' 
-              : 'bg-red-50 border-red-200'
+              ? 'bg-green-900/20 border-green-500/30' 
+              : 'bg-red-900/20 border-red-500/30'
           }`}>
             <div className="flex items-center">
               <div className={`text-2xl mr-3 ${
-                cameraPermission === 'granted' ? 'text-green-500' : 'text-red-500'
+                cameraPermission === 'granted' ? 'text-green-400' : 'text-red-400'
               }`}>
                 {cameraPermission === 'granted' ? '✅' : '❌'}
               </div>
               <div>
-                <h4 className={`font-semibold ${
-                  cameraPermission === 'granted' ? 'text-green-800' : 'text-red-800'
+                <h4 className={`native-feature-title ${
+                  cameraPermission === 'granted' ? 'text-green-400' : 'text-red-400'
                 }`}>
                   {cameraPermission === 'granted' ? 'Разрешения получены' : 'Проблема с разрешениями'}
                 </h4>
-                <p className={`text-sm ${
-                  cameraPermission === 'granted' ? 'text-green-600' : 'text-red-600'
+                <p className={`native-feature-text ${
+                  cameraPermission === 'granted' ? 'text-green-400' : 'text-red-400'
                 }`}>
                   {permissionMessage}
                 </p>
                 {cameraPermission === 'denied' && (
-                  <div className="mt-2 space-y-1 text-xs text-red-600">
+                  <div className="mt-2 space-y-1 text-xs text-red-400">
                     <p>• Нажмите кнопку "🔐 Проверить разрешения" для повторной попытки</p>
                     <p>• Убедитесь, что используете HTTPS соединение</p>
                     <p>• Разрешите доступ к камере в настройках браузера</p>
@@ -477,13 +477,13 @@ function App() {
 
         {/* Ошибка камеры */}
         {cameraError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+          <div className="native-section bg-red-900/20 border-red-500/30 mb-6">
             <div className="flex items-center">
-              <div className="text-red-500 text-2xl mr-3">📷</div>
+              <div className="text-red-400 text-2xl mr-3">📷</div>
               <div>
-                <h4 className="font-semibold text-red-800">Проблема с камерой</h4>
-                <p className="text-red-600 text-sm">{cameraError}</p>
-                <div className="mt-2 space-y-1 text-xs text-red-600">
+                <h4 className="native-feature-title text-red-400">Проблема с камерой</h4>
+                <p className="native-feature-text text-red-400">{cameraError}</p>
+                <div className="mt-2 space-y-1 text-xs text-red-400">
                   <p>• Убедитесь, что используете HTTPS соединение</p>
                   <p>• Разрешите доступ к камере в настройках браузера</p>
                   <p>• Попробуйте Chrome или Safari на мобильных устройствах</p>
@@ -498,7 +498,7 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Камера/Изображение */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-800 text-center">
+            <h2 className="native-feature-title text-center">
               {isCameraActive ? 'Камера' : 'Изображение'}
             </h2>
             
@@ -514,7 +514,7 @@ function App() {
                 <div className="camera-overlay">
                   <button
                     onClick={takePhoto}
-                    className="bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-110"
+                    className="native-button bg-white/90 hover:bg-white text-gray-800 px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-110"
                   >
                     📸 Сделать снимок
                   </button>
@@ -536,8 +536,8 @@ function App() {
                 </button>
               </div>
             ) : (
-              <div className="bg-gray-200 w-full h-80 rounded-xl flex items-center justify-center">
-                <div className="text-center text-gray-500">
+              <div className="bg-gray-800 w-full h-80 rounded-xl flex items-center justify-center">
+                <div className="text-center text-gray-400">
                   <div className="text-6xl mb-4">📷</div>
                   <p>Камера неактивна</p>
                   <p className="text-sm mt-1">Выберите изображение из галереи</p>
@@ -548,42 +548,42 @@ function App() {
 
           {/* Результаты */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-800 text-center">
+            <h2 className="native-feature-title text-center">
               Результаты
             </h2>
             
             {prediction ? (
-              <div className="bg-white rounded-xl p-6 shadow-lg result-fade-in">
+              <div className="native-card result-fade-in">
                 <div className="text-center mb-4">
                   <div className="text-4xl mb-2">🎯</div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  <h3 className="native-feature-title mb-2">
                     Распознано: {prediction}
                   </h3>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className="bg-green-500 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${confidence * 100}%` }}
                     ></div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="native-feature-text mt-2">
                     Уверенность: {(confidence * 100).toFixed(1)}%
                   </p>
                 </div>
                 
-                <div className="border-t pt-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">Описание:</h4>
-                  <p className="text-gray-600 leading-relaxed">
+                <div className="border-t border-gray-600 pt-4">
+                  <h4 className="native-feature-title mb-2">Описание:</h4>
+                  <p className="native-feature-text leading-relaxed">
                     {classDescriptions[prediction] || 'Описание для этого класса не найдено.'}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <div className="native-card text-center">
                 <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <h3 className="native-feature-title mb-2">
                   Ожидание изображения
                 </h3>
-                <p className="text-gray-600">
+                <p className="native-feature-text">
                   {isCameraActive 
                     ? 'Сделайте снимок или дождитесь автоматического распознавания'
                     : 'Запустите камеру или выберите изображение из галереи'
@@ -593,15 +593,15 @@ function App() {
             )}
 
             {/* Инструкции */}
-            <div className="bg-blue-50 rounded-xl p-4">
-              <h4 className="font-semibold text-blue-800 mb-2">💡 Советы:</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Убедитесь, что объект хорошо освещен</li>
-                <li>• Попробуйте разные ракурсы</li>
-                <li>• Держите камеру неподвижно</li>
-                <li>• Если не распознается, попробуйте другой ракурс</li>
-                <li>• На Android используйте Chrome или Safari</li>
-                <li>• Убедитесь в HTTPS соединении</li>
+            <div className="native-instructions">
+              <h4 className="native-instructions-title">💡 Советы:</h4>
+              <ul className="space-y-1">
+                <li className="native-instructions-text">• Убедитесь, что объект хорошо освещен</li>
+                <li className="native-instructions-text">• Попробуйте разные ракурсы</li>
+                <li className="native-instructions-text">• Держите камеру неподвижно</li>
+                <li className="native-instructions-text">• Если не распознается, попробуйте другой ракурс</li>
+                <li className="native-instructions-text">• На Android используйте Chrome или Safari</li>
+                <li className="native-instructions-text">• Убедитесь в HTTPS соединении</li>
               </ul>
             </div>
           </div>
