@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import App from './App'; // Существующая страница с ИИ
 import ThreeDObjects from './components/ThreeDObjects';
 import { CameraIcon, BuildingIcon, BrainIcon, MobileIcon, GlobeIcon, RocketIcon } from './components/Icons';
+import { Analytics } from "@vercel/analytics/react"
 import './index.css';
 
 function MainApp() {

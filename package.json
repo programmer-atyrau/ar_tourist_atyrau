@@ -10,6 +10,7 @@
     "@react-three/fiber": "^8.15.19",
     "@tensorflow/tfjs": "^4.15.0",
     "@tensorflow/tfjs-converter": "^4.15.0",
+    "@vercel/analytics": "^1.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-refresh": "^0.17.0",
